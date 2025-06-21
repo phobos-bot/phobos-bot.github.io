@@ -1,2 +1,2 @@
 # webpage
-Our team's webpage
+Our team's webpage.
