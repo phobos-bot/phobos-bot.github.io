@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHOBOS-BOT Smart Buoy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6', // A shade of blue
+                        secondary: '#10B981', // A shade of green
+                        accent: '#F59E0B', // A shade of orange
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: white;
+            color: #333;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            padding-top: 6rem; /* Add padding to prevent content from being hidden behind fixed navbar */
+        }
+        .section {
+            padding: 4rem 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .section.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .header-bg {
+            background: linear-gradient(135deg, #60A5FA, #3B82F6);
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.15);
+        }
+        .animate-bounce-custom {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(-5%);
+                animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+            }
+            50% {
+                transform: translateY(0);
+                animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+            }
+        }
+        /* Custom styles for animations */
+        .reveal-text {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end) forwards;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        .slide-in-left {
+            transform: translateX(-100%);
+            opacity: 0;
+            animation: slideInLeft 1s forwards;
+        }
+
+        @keyframes slideInLeft {
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .slide-in-right {
+            transform: translateX(100%);
+            opacity: 0;
+            animation: slideInRight 1s forwards;
+        }
+
+        @keyframes slideInRight {
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .beat {
+            width: 300px; /* Ajusta el tamaño de tu imagen si es necesario */
+            height: auto;
+            animation: beat 2s infinite alternate; /* Aplica la animación */
+            transform-origin: center; /* Asegura que la escala se origine desde el centro */
+        }
+        @keyframes beat {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body class="bg-white">
+
+    <header class="header-bg text-white p-6 md:p-8 shadow-lg fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4 md:mb-0" data-key="header_title">PHOBOS-BOT <span class="text-accent">Smart Buoy</span></h1>
+            <nav>
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="#problema" class="hover:underline text-lg" data-key="nav_problem">Problema</a></li>
+                    <li><a href="#solucion" class="hover:underline text-lg" data-key="nav_solution">Solución</a></li>
+                    <li><a href="#prototipo" class="hover:underline text-lg" data-key="nav_prototype">Prototipo</a></li>
+                    <li><a href="#impacto" class="hover:underline text-lg" data-key="nav_impact">Impacto</a></li>
+                    <li><a href="#contacto" class="hover:underline text-lg" data-key="nav_contact">Contacto</a></li>
+                    <li class="ml-4">
+                        <button id="lang-en" class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">EN</button>
+                    </li>
+                    <li>
+                        <button id="lang-es" class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">ES</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="relative h-screen flex items-center justify-center text-center bg-gray-100 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-200 to-cyan-200 opacity-75"></div>
+        <div class="relative z-10 p-6 max-w-4xl mx-auto">
+            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+                        <br>
+                        <img src="media/logo.png" alt="Logo_Phobos.png" class="beat">
+                        <img src="media/logo2.png" alt="Logo_Avanza.png" class="beat">
+                        <br>
+                    </div>
+                <br>
+            <h2 class="text-5xl md:text-7xl font-extrabold text-gray-800 leading-tight mb-6 animate-bounce-custom" data-key="hero_title">
+                Protegiendo Nuestros Océanos
+            </h2>
+            <p class="text-xl md:text-2xl text-gray-700 mb-8 reveal-text" data-key="hero_subtitle">
+                Una boya inteligente para la monitorización y protección marina.
+            </p>
+            <a href="#problema" class="bg-primary text-white px-8 py-3 rounded-full text-xl font-semibold shadow-lg hover:bg-blue-700 transition duration-300" data-key="hero_discover_more">
+                Descubre Más
+            </a>
+        </div>
+    </section>
+
+    <section id="problema" class="section bg-white text-gray-800">
+        <div class="container mx-auto px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12 text-primary" data-key="problem_section_title">Identificación del Problema</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
+                <div class="card p-6 slide-in-left">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4" data-key="problem_level1_title">1er Nivel: Phobos-Bot</h3>
+                    <p class="text-lg" data-key="problem_level1_text">Realizamos trabajo de campo, investigando playas y costas, y visitando centros especializados para identificar problemas a través de nuestros propios conocimientos y lluvia de ideas.</p>
+                </div>
+                <div class="card p-6 slide-in-up">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4" data-key="problem_level2_title">2do Nivel: Entorno Cercano</h3>
+                    <p class="text-lg" data-key="problem_level2_text">Entrevistas a familiares, amigos y profesores nos ofrecieron una visión de la evolución de la biodiversidad y el entorno marino, y los problemas que les preocupan.</p>
+                </div>
+                <div class="card p-6 slide-in-right">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4" data-key="problem_level3_title">3er Nivel: Investigación Bibliográfica y Expertos</h3>
+                    <p class="text-lg" data-key="problem_level3_text">Publicaciones científicas y expertos de instituciones como National Geographic o el Instituto Español de Oceanografía nos ayudaron a comprender el océano como un sistema vivo y crucial para nuestra existencia.</p>
+                </div>
+            </div>
+            <div class="mt-12 text-center">
+                <p class="text-xl text-gray-700" data-key="problem_central_text">El problema central identificado es la <strong class="text-red-600">destrucción de los ecosistemas marinos protegidos</strong> debido a la acidificación, el aumento de la temperatura y el incremento de la salinidad, lo que estresa a las especies marinas.</p>
+            </div>
+            <div class="mt-8 flex justify-center">
+                <img src="media/corales.jpg" alt="Corales y Vida Marina" class="rounded-xl shadow-lg w-full md:w-3/4 lg:w-1/2">
+            </div>
+        </div>
+    </section>
+
+    <section id="solucion" class="section bg-gray-50 text-gray-800">
+        <div class="container mx-auto px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12 text-primary" data-key="solution_section_title">Diseño de la Solución</h2>
+            <div class="flex flex-col md:flex-row items-center justify-center md:space-x-10">
+                <div class="md:w-1/2 mb-8 md:mb-0 slide-in-left">
+                    <p class="text-lg mb-6 leading-relaxed" data-key="solution_description">
+                        Nuestro equipo ideó varias soluciones alternativas, pero gracias a la retroalimentación de expertos, nos decidimos por la boya inteligente. Esta boya ha sido modificada y mejorada para convertirse en un sistema perfecto de protección perimetral y monitorización de parámetros básicos.
+                    </p>
+                    <ul class="list-disc list-inside text-lg space-y-2">
+                        <li><strong class="text-secondary" data-key="solution_param1_title">Inclusión de Parámetros Esenciales:</strong> <span data-key="solution_param1_text">Medición de pH, salinidad y temperatura, esenciales para la salud marina.</span></li>
+                        <li><strong class="text-secondary" data-key="solution_param2_title">Materiales Respetuosos:</strong> <span data-key="solution_param2_text">Empleo de materiales que no dañan el medio acuático.</span></li>
+                        <li><strong class="text-secondary" data-key="solution_param3_title">Energía Renovable:</strong> <span data-key="solution_param3_text">Alimentación mediante energía fotovoltaica para una solución sostenible.</span></li>
+                        <li><strong class="text-secondary" data-key="solution_param4_title">Diseño Modular:</strong> <span data-key="solution_param4_text">Fácil acceso y reparación por módulos, facilitando el mantenimiento.</span></li>
+                        <li><strong class="text-secondary" data-key="solution_param5_title">Adaptación a Estructuras Existentes:</strong> <span data-key="solution_param5_text">Diseño de chasis de acople directo para una implementación inmediata en boyas ya existentes.</span></li>
+                    </ul>
+                </div>
+                <div class="md:w-1/2 slide-in-right">
+                    <img src="media/boya.jpg" alt="Diseño de Solución" class="rounded-xl shadow-lg w-full">
+                </div>
+            </div>
+            <div class="mt-12 text-center reveal-text">
+                <p class="text-xl text-gray-700" data-key="solution_methodology">Trabajamos con reuniones periódicas, diagramas de Gantt y metodología Scrum para asegurar la viabilidad y el cumplimiento de plazos del proyecto, incorporando constantemente las ideas y el feedback de los expertos.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="prototipo" class="section bg-white text-gray-800">
+        <div class="container mx-auto px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12 text-primary" data-key="prototype_section_title">Creación del Modelo Prototipo</h2>
+            <div class="flex flex-col md:flex-row items-center justify-center md:space-x-10">
+                <div class="md:w-1/2 mb-8 md:mb-0 slide-in-left">
+                    <img src="https://placehold.co/600x400/93C5FD/FFFFFF?text=Boya+Prototipo" alt="Boya Prototipo" class="rounded-xl shadow-lg w-full">
+                </div>
+                <div class="md:w-1/2 slide-in-right">
+                    <h3 class="text-3xl font-semibold text-secondary mb-6" data-key="prototype_features_title">Características del Prototipo Funcional</h3>
+                    <p class="text-lg mb-4 leading-relaxed" data-key="prototype_description">
+                        Nuestro prototipo es el resultado de múltiples pruebas y mejoras, así como de las críticas constructivas de nuestros expertos. Se trata de un sistema completamente funcional basado en Arduino, diseñado para una monitorización marina integral.
+                    </p>
+                    <ul class="list-disc list-inside text-lg space-y-2">
+                        <li><strong class="text-accent" data-key="prototype_sensor_title">Sensores Integrados:</strong> <span data-key="prototype_sensor_text">pH, salinidad, temperatura y ultrasonidos para detección de proximidad.</span></li>
+                        <li><strong class="text-accent" data-key="prototype_communication_title">Comunicación:</strong> <span data-key="prototype_communication_text">Módulo Bluetooth para envío de datos y radiofrecuencia para alertas.</span></li>
+                        <li><strong class="text-accent" data-key="prototype_storage_title">Almacenamiento:</strong> <span data-key="prototype_storage_text">Tarjeta SD para guardar la información recopilada.</span></li>
+                        <li><strong class="text-accent" data-key="prototype_power_title">Sistema de Alimentación:</strong> <span data-key="prototype_power_text">12 placas solares para una autonomía de 3.1 días (15000mA).</span></li>
+                        <li><strong class="text-accent" data-key="prototype_control_title">Centralita de Control:</strong> <span data-key="prototype_control_text">Con receptor RF, LEDs indicadores, zumbador de emergencia y control de encendido/apagado.</span></li>
+                        <li><strong class="text-accent" data-key="prototype_improvements_title">Mejoras Clave:</strong> <span data-key="prototype_improvements_text">Sistema repelente de aves, peso adicional para estabilidad, aleta para evitar giros incontrolados, desagüe y sellado de uniones.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="impacto" class="section bg-gray-50 text-gray-800">
+        <div class="container mx-auto px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12 text-primary" data-key="impact_section_title">Impacto de la Innovación</h2>
+            <p class="text-xl text-center mb-10 leading-relaxed reveal-text" data-key="impact_intro_text">
+                La vida marina es fundamental e imprescindible. Su desaparición significa perder el equilibrio del planeta y nuestro futuro. ¡Nuestro equipo no lo puede consentir! Estamos orgullosos de la confianza que nos han brindado instituciones y empresas, quienes nos han felicitado por desarrollar un proyecto con un impacto real en la preservación de los ecosistemas marinos.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="card p-6 slide-in-left">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4" data-key="impact_perimeter_title">Vigilancia Perimetral</h3>
+                    <ul class="list-disc list-inside text-lg space-y-2">
+                        <li data-key="impact_perimeter_point1">Protección de la biodiversidad.</li>
+                        <li data-key="impact_perimeter_point2">Control de actividades ilegales.</li>
+                        <li data-key="impact_perimeter_point3">Mejora de la gestión sostenible.</li>
+                        <li data-key="impact_perimeter_point4">Prevención de la contaminación.</li>
+                        <li data-key="impact_perimeter_point5">Detección temprana de cambios ambientales.</li>
+                        <li data-key="impact_perimeter_point6">Colaboración internacional.</li>
+                        <li data-key="impact_perimeter_point7">Fomento del turismo responsable.</li>
+                    </ul>
+                </div>
+                <div class="card p-6 slide-in-right">
+                    <h3 class="text-2xl font-semibold text-secondary mb-4" data-key="impact_monitoring_title">Monitorización de Parámetros</h3>
+                    <ul class="list-disc list-inside text-lg space-y-2">
+                        <li data-key="impact_monitoring_point1">Detección temprana de cambios.</li>
+                        <li data-key="impact_monitoring_point2">Evaluación de la salud del ecosistema.</li>
+                        <li data-key="impact_monitoring_point3">Desarrollo de estrategias de conservación efectivas.</li>
+                        <li data-key="impact_monitoring_point4">Monitoreo de especies en peligro.</li>
+                        <li data-key="impact_monitoring_point5">Prevención de desastres ecológicos.</li>
+                        <li data-key="impact_monitoring_point6">Toma de decisiones informadas.</li>
+                        <li data-key="impact_monitoring_point7">Concienciación pública.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 text-center">
+                <h3 class="text-3xl font-semibold text-accent mb-6" data-key="impact_implementation_title">Implementación y Colaboraciones</h3>
+                <p class="text-lg leading-relaxed mb-4" data-key="impact_implementation_text">
+                    Nuestro proyecto va más allá del prototipo. Gracias a nuestro plan de implementación, nuestra innovación llegará a los mares y zonas protegidas.
+                </p>
+                <ul class="list-disc list-inside text-lg space-y-2 text-left inline-block">
+                    <li><strong class="text-primary" data-key="impact_sea_life_title">Sea Life:</strong> <span data-key="impact_sea_life_text">Nos ha ofrecido emplear nuestro proyecto en sus tanques y santuarios.</span></li>
+                    <li><strong class="text-primary" data-key="impact_marbella_city_council_title">Ayuntamiento de Marbella:</strong> <span data-key="impact_marbella_city_council_text">Apoyo total, mediación y acceso a colaboraciones con empresas locales.</span></li>
+                </ul>
+                <div class="mt-8 flex justify-center">
+                    <img src="media/equipo.jpg" alt="Equipo PHOBOS-BOT" class="rounded-xl shadow-lg w-full md:w-3/4 lg:w-1/2">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contacto" class="section bg-gradient-to-br from-blue-200 to-cyan-200 text-gray-800">
+        <div class="container mx-auto px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold mb-8 text-primary" data-key="contact_section_title">Contáctanos</h2>
+            <p class="text-xl mb-8" data-key="contact_intro_text">¿Interesado en proteger nuestros océanos? ¡Aquí puedes encontrarnos!</p>
+            <div class="max-w-md mx-auto card p-8 flex flex-col items-center justify-center space-y-6">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-envelope text-primary text-3xl"></i>
+                    <p class="text-lg" data-key="contact_email_text"><a href="mailto:phobosbot2019@gmail.com" class="text-primary hover:underline font-semibold">phobosbot2019@gmail.com</a></p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <i class="fab fa-instagram text-primary text-3xl"></i>
+                    <p class="text-lg" data-key="contact_instagram_text"><a href="https://www.instagram.com/phobos_bot.mlg" class="text-primary hover:underline font-semibold">@phobos_bot.mlg</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white p-6 md:p-8 text-center">
+        <div class="container mx-auto">
+            <p data-key="footer_text">&copy; 2025 PHOBOS-BOT Boya Inteligente. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Place your translations object here or link an external translations.js file
+        const translations = {
+            // ... (copy the translations object from step 1 here)
+            "header_title": {
+                "es": "PHOBOS-BOT <span class=\"text-accent\">Smart Buoy</span>",
+                "en": "PHOBOS-BOT <span class=\"text-accent\">Smart Buoy</span>"
+            },
+            "nav_problem": {
+                "es": "Problema",
+                "en": "Problem"
+            },
+            "nav_solution": {
+                "es": "Solución",
+                "en": "Solution"
+            },
+            "nav_prototype": {
+                "es": "Prototipo",
+                "en": "Prototype"
+            },
+            "nav_impact": {
+                "es": "Impacto",
+                "en": "Impact"
+            },
+            "nav_contact": {
+                "es": "Contacto",
+                "en": "Contact"
+            },
+            "hero_title": {
+                "es": "Protegiendo Nuestros Océanos",
+                "en": "Protecting Our Oceans"
+            },
+            "hero_subtitle": {
+                "es": "Una boya inteligente para la monitorización y protección marina.",
+                "en": "A smart buoy for marine monitoring and protection."
+            },
+            "hero_discover_more": {
+                "es": "Descubre Más",
+                "en": "Discover More"
+            },
+            "problem_section_title": {
+                "es": "Identificación del Problema",
+                "en": "Problem Identification"
+            },
+            "problem_level1_title": {
+                "es": "1er Nivel: Phobos-Bot",
+                "en": "1st Level: Phobos-Bot"
+            },
+            "problem_level1_text": {
+                "es": "Realizamos trabajo de campo, investigando playas y costas, y visitando centros especializados para identificar problemas a través de nuestros propios conocimientos y lluvia de ideas.",
+                "en": "We conducted fieldwork, researching beaches and coastlines, and visiting specialized centers to identify problems through our own knowledge and brainstorming."
+            },
+            "problem_level2_title": {
+                "es": "2do Nivel: Entorno Cercano",
+                "en": "2nd Level: Close Environment"
+            },
+            "problem_level2_text": {
+                "es": "Entrevistas a familiares, amigos y profesores nos ofrecieron una visión de la evolución de la biodiversidad y el entorno marino, y los problemas que les preocupan.",
+                "en": "Interviews with family, friends, and professors gave us insight into the evolution of marine biodiversity and environment, and the problems that concern them."
+            },
+            "problem_level3_title": {
+                "es": "3er Nivel: Investigación Bibliográfica y Expertos",
+                "en": "3rd Level: Literature Research and Experts"
+            },
+            "problem_level3_text": {
+                "es": "Publicaciones científicas y expertos de instituciones como National Geographic o el Instituto Español de Oceanografía nos ayudaron a comprender el océano como un sistema vivo y crucial para nuestra existencia.",
+                "en": "Scientific publications and experts from institutions like National Geographic or the Spanish Institute of Oceanography helped us understand the ocean as a living system crucial for our existence."
+            },
+            "problem_central_text": {
+                "es": "El problema central identificado es la <strong class=\"text-red-600\">destrucción de los ecosistemas marinos protegidos</strong> debido a la acidificación, el aumento de la temperatura y el incremento de la salinidad, lo que estresa a las especies marinas.",
+                "en": "The central problem identified is the <strong class=\"text-red-600\">destruction of protected marine ecosystems</strong> due to acidification, increased temperature, and increased salinity, which stresses marine species."
+            },
+            "solution_section_title": {
+                "es": "Diseño de la Solución",
+                "en": "Solution Design"
+            },
+            "solution_description": {
+                "es": "Nuestro equipo ideó varias soluciones alternativas, pero gracias a la retroalimentación de expertos, nos decidimos por la boya inteligente. Esta boya ha sido modificada y mejorada para convertirse en un sistema perfecto de protección perimetral y monitorización de parámetros básicos.",
+                "en": "Our team devised several alternative solutions, but thanks to expert feedback, we decided on the smart buoy. This buoy has been modified and improved to become a perfect system for perimeter protection and basic parameter monitoring."
+            },
+            "solution_param1_title": {
+                "es": "Inclusión de Parámetros Esenciales:",
+                "en": "Inclusion of Essential Parameters:"
+            },
+            "solution_param1_text": {
+                "es": "Medición de pH, salinidad y temperatura, esenciales para la salud marina.",
+                "en": "Measurement of pH, salinity, and temperature, essential for marine health."
+            },
+            "solution_param2_title": {
+                "es": "Materiales Respetuosos:",
+                "en": "Eco-Friendly Materials:"
+            },
+            "solution_param2_text": {
+                "es": "Empleo de materiales que no dañan el medio acuático.",
+                "en": "Use of materials that do not harm the aquatic environment."
+            },
+            "solution_param3_title": {
+                "es": "Energía Renovable:",
+                "en": "Renewable Energy:"
+            },
+            "solution_param3_text": {
+                "es": "Alimentación mediante energía fotovoltaica para una solución sostenible.",
+                "en": "Powered by photovoltaic energy for a sustainable solution."
+            },
+            "solution_param4_title": {
+                "es": "Diseño Modular:",
+                "en": "Modular Design:"
+            },
+            "solution_param4_text": {
+                "es": "Fácil acceso y reparación por módulos, facilitando el mantenimiento.",
+                "en": "Easy access and repair by modules, facilitating maintenance."
+            },
+            "solution_param5_title": {
+                "es": "Adaptación a Estructuras Existentes:",
+                "en": "Adaptation to Existing Structures:"
+            },
+            "solution_param5_text": {
+                "es": "Diseño de chasis de acople directo para una implementación inmediata en boyas ya existentes.",
+                "en": "Direct coupling chassis design for immediate implementation on existing buoys."
+            },
+            "solution_methodology": {
+                "es": "Trabajamos con reuniones periódicas, diagramas de Gantt y metodología Scrum para asegurar la viabilidad y el cumplimiento de plazos del proyecto, incorporando constantemente las ideas y el feedback de los expertos.",
+                "en": "We work with periodic meetings, Gantt charts, and Scrum methodology to ensure the viability and timely completion of the project, constantly incorporating ideas and feedback from experts."
+            },
+            "prototype_section_title": {
+                "es": "Creación del Modelo Prototipo",
+                "en": "Prototype Model Creation"
+            },
+            "prototype_features_title": {
+                "es": "Características del Prototipo Funcional",
+                "en": "Functional Prototype Features"
+            },
+            "prototype_description": {
+                "es": "Nuestro prototipo es el resultado de múltiples pruebas y mejoras, así como de las críticas constructivas de nuestros expertos. Se trata de un sistema completamente funcional basado en Arduino, diseñado para una monitorización marina integral.",
+                "en": "Our prototype is the result of multiple tests and improvements, as well as constructive criticism from our experts. It is a fully functional Arduino-based system, designed for comprehensive marine monitoring."
+            },
+            "prototype_sensor_title": {
+                "es": "Sensores Integrados:",
+                "en": "Integrated Sensors:"
+            },
+            "prototype_sensor_text": {
+                "es": "pH, salinidad, temperatura y ultrasonidos para detección de proximidad.",
+                "en": "pH, salinity, temperature, and ultrasound for proximity detection."
+            },
+            "prototype_communication_title": {
+                "es": "Comunicación:",
+                "en": "Communication:"
+            },
+            "prototype_communication_text": {
+                "es": "Módulo Bluetooth para envío de datos y radiofrecuencia para alertas.",
+                "en": "Bluetooth module for data transmission and radiofrequency for alerts."
+            },
+            "prototype_storage_title": {
+                "es": "Almacenamiento:",
+                "en": "Storage:"
+            },
+            "prototype_storage_text": {
+                "es": "Tarjeta SD para guardar la información recopilada.",
+                "en": "SD card for storing collected information."
+            },
+            "prototype_power_title": {
+                "es": "Sistema de Alimentación:",
+                "en": "Power System:"
+            },
+            "prototype_power_text": {
+                "es": "12 placas solares para una autonomía de 3.1 días (15000mA).",
+                "en": "12 solar panels for 3.1 days of autonomy (15000mA)."
+            },
+            "prototype_control_title": {
+                "es": "Centralita de Control:",
+                "en": "Control Unit:"
+            },
+            "prototype_control_text": {
+                "es": "Con receptor RF, LEDs indicadores, zumbador de emergencia y control de encendido/apagado.",
+                "en": "With RF receiver, indicator LEDs, emergency buzzer, and on/off control."
+            },
+            "prototype_improvements_title": {
+                "es": "Mejoras Clave:",
+                "en": "Key Improvements:"
+            },
+            "prototype_improvements_text": {
+                "es": "Sistema repelente de aves, peso adicional para estabilidad, aleta para evitar giros incontrolados, desagüe y sellado de uniones.",
+                "en": "Bird repellent system, additional weight for stability, fin to prevent uncontrolled turns, drainage, and sealing of joints."
+            },
+            "impact_section_title": {
+                "es": "Impacto de la Innovación",
+                "en": "Impact of Innovation"
+            },
+            "impact_intro_text": {
+                "es": "La vida marina es fundamental e imprescindible. Su desaparición significa perder el equilibrio del planeta y nuestro futuro. ¡Nuestro equipo no lo puede consentir! Estamos orgullosos de la confianza que nos han brindado instituciones y empresas, quienes nos han felicitado por desarrollar un proyecto con un impacto real en la preservación de los ecosistemas marinos.",
+                "en": "Marine life is fundamental and indispensable. Its disappearance means losing the planet's balance and our future. Our team cannot allow it! We are proud of the trust that institutions and companies have placed in us, who have congratulated us for developing a project with a real impact on the preservation of marine ecosystems."
+            },
+            "impact_perimeter_title": {
+                "es": "Vigilancia Perimetral",
+                "en": "Perimeter Surveillance"
+            },
+            "impact_perimeter_point1": {
+                "es": "Protección de la biodiversidad.",
+                "en": "Biodiversity protection."
+            },
+            "impact_perimeter_point2": {
+                "es": "Control de actividades ilegales.",
+                "en": "Control of illegal activities."
+            },
+            "impact_perimeter_point3": {
+                "es": "Mejora de la gestión sostenible.",
+                "en": "Improvement of sustainable management."
+            },
+            "impact_perimeter_point4": {
+                "es": "Prevención de la contaminación.",
+                "en": "Pollution prevention."
+            },
+            "impact_perimeter_point5": {
+                "es": "Detección temprana de cambios ambientales.",
+                "en": "Early detection of environmental changes."
+            },
+            "impact_perimeter_point6": {
+                "es": "Colaboración internacional.",
+                "en": "International collaboration."
+            },
+            "impact_perimeter_point7": {
+                "es": "Fomento del turismo responsable.",
+                "en": "Promotion of responsible tourism."
+            },
+            "impact_monitoring_title": {
+                "es": "Monitorización de Parámetros",
+                "en": "Parameter Monitoring"
+            },
+            "impact_monitoring_point1": {
+                "es": "Detección temprana de cambios.",
+                "en": "Early change detection."
+            },
+            "impact_monitoring_point2": {
+                "es": "Evaluación de la salud del ecosistema.",
+                "en": "Ecosystem health assessment."
+            },
+            "impact_monitoring_point3": {
+                "es": "Desarrollo de estrategias de conservación efectivas.",
+                "en": "Development of effective conservation strategies."
+            },
+            "impact_monitoring_point4": {
+                "es": "Monitoreo de especies en peligro.",
+                "en": "Monitoring endangered species."
+            },
+            "impact_monitoring_point5": {
+                "es": "Prevención de desastres ecológicos.",
+                "en": "Prevention of ecological disasters."
+            },
+            "impact_monitoring_point6": {
+                "es": "Toma de decisiones informadas.",
+                "en": "Informed decision-making."
+            },
+            "impact_monitoring_point7": {
+                "es": "Concienciación pública.",
+                "en": "Public awareness."
+            },
+            "impact_implementation_title": {
+                "es": "Implementación y Colaboraciones",
+                "en": "Implementation and Collaborations"
+            },
+            "impact_implementation_text": {
+                "es": "Nuestro proyecto va más allá del prototipo. Gracias a nuestro plan de implementación, nuestra innovación llegará a los mares y zonas protegidas.",
+                "en": "Our project goes beyond the prototype. Thanks to our implementation plan, our innovation will reach seas and protected areas."
+            },
+            "impact_sea_life_title": {
+                "es": "Sea Life:",
+                "en": "Sea Life:"
+            },
+            "impact_sea_life_text": {
+                "es": "Nos ha ofrecido emplear nuestro proyecto en sus tanques y santuarios.",
+                "en": "Has offered us to use our project in their tanks and sanctuaries."
+            },
+            "impact_marbella_city_council_title": {
+                "es": "Ayuntamiento de Marbella:",
+                "en": "Marbella City Council:"
+            },
+            "impact_marbella_city_council_text": {
+                "es": "Apoyo total, mediación y acceso a colaboraciones con empresas locales.",
+                "en": "Full support, mediation, and access to collaborations with local businesses."
+            },
+            "contact_section_title": {
+                "es": "Contáctanos",
+                "en": "Contact Us"
+            },
+            "contact_intro_text": {
+                "es": "¿Interesado en proteger nuestros océanos? ¡Aquí puedes encontrarnos!",
+                "en": "Interested in protecting our oceans? You can find us here!"
+            },
+            "footer_text": {
+                "es": "&copy; 2025 PHOBOS-BOT. Todos los derechos reservados.",
+                "en": "&copy; 2025 PHOBOS-BOT. All rights reserved."
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.section');
+            const langEnButton = document.getElementById('lang-en');
+            const langEsButton = document.getElementById('lang-es');
+
+            // Function to set the language
+            function setLanguage(lang) {
+                document.documentElement.lang = lang; // Update the lang attribute of the html tag
+                document.querySelectorAll('[data-key]').forEach(element => {
+                    const key = element.getAttribute('data-key');
+                    if (translations[key] && translations[key][lang]) {
+                        // Use innerHTML for text that contains HTML (like the header title strong tag)
+                        // Be careful with user-generated content and innerHTML to prevent XSS
+                        element.innerHTML = translations[key][lang];
+                    }
+                });
+                // Store the selected language in local storage
+                localStorage.setItem('preferredLanguage', lang);
+            }
+
+            // Check for a preferred language in local storage on load
+            const storedLanguage = localStorage.getItem('preferredLanguage');
+            if (storedLanguage) {
+                setLanguage(storedLanguage);
+            } else {
+                // Default to Spanish if no language is stored
+                setLanguage('es');
+            }
+
+            // Event listeners for language switch buttons
+            langEnButton.addEventListener('click', () => setLanguage('en'));
+            langEsButton.addEventListener('click', () => setLanguage('es'));
+
+            const fadeIn = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            };
+
+            const sectionObserver = new IntersectionObserver(fadeIn, {
+                root: null,
+                threshold: 0.1
+            });
+
+            sections.forEach(section => {
+                sectionObserver.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
